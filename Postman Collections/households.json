@@ -1,0 +1,366 @@
+{
+  "info": {
+    "_postman_id": "192b3311-4eab-434d-981c-7e4456d97e3c",
+    "name": "Household Wishlists",
+    "description": "# Introduction\nThis collection interacts with a household wishlist\n\n# Overview\nEvery request requires a G-Token key\n\n# Authentication\nThis collection doesn't require any special authentication\n\n# Error Codes\nThe most common reason for a 403 is that the G-Token is not supplied\n\n# Rate limit\nTThis API is not rate limited",
+    "schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create Household",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.globals.set(\"householdId\", pm.response.json().id);"
+            ],
+            "type": "text/javascript",
+            "id": "59a4c17e-1108-4352-afe0-c2e2c8727845"
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "pm.globals.set(\"numberOfUsers\", 2);",
+              "pm.globals.set(\"currentUserCount\", 0);",
+              "",
+              "pm.globals.set(\"numberOfWishlistAdds\", 4);",
+              "pm.globals.set(\"currentWishlistCount\", 0);",
+              "",
+              "pm.globals.set(\"wishlistIds\", []);",
+              "",
+              "const getBooks = {",
+              "    url: `http://${pm.environment.get(\"host\")}/books`,",
+              "    method: \"GET\",",
+              "    header: \"G-TOKEN:ROM831ESV\" ",
+              "}",
+              "",
+              "pm.sendRequest(getBooks, function(err, books){",
+              "    const ids = _.map(books.json(), function(book){ ",
+              "        return book.id; ",
+              "    });",
+              "",
+              "    pm.globals.set(\"bookIds\", ids)",
+              "})"
+            ],
+            "type": "text/javascript",
+            "id": "aede7d8e-f2b9-428a-8c53-4cfc9ea5e2d5"
+          }
+        }
+      ],
+      "_postman_id": "e711c1ac-c814-4ada-afe4-404490bfad9a",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "G-TOKEN",
+            "value": "ROM831ESV",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n       \"name\": \"Taylor Household\"\n       \n}",
+          "options": {
+            "raw": {}
+          }
+        },
+        "url": "{{host}}/households",
+        "description": "This request will generate a new `Household` in the Globomantics Library API"
+      },
+      "response": [
+        {
+          "id": "a0308665-2e4c-4361-95f8-c0ecfa0aac25",
+          "name": "Create Household",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "G-TOKEN",
+                "value": "ROM831ESV",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n       \"name\": \"Taylor Household\"\n       \n}"
+            },
+            "url": "{{host}}/households"
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "responseTime": null,
+          "body": "{\n\t\"id\": 1,\n\t\"name\": \"Taylor Household\",\n\t\"updatedAt\": \"2017-11-18T23:25:50.016Z\",\n\t\"createdAt\": \"2017-11-18T23:25:50.016Z\",\n\t\"links\": [{\n\t\t\"rel\": \"self\",\n\t\t\"href\": \"http://localhost:3000/households/1\"\n\t}]\n}"
+        }
+      ]
+    },
+    {
+      "name": "Create User",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const ids = pm.globals.get(\"wishlistIds\");",
+              "ids.push(pm.response.json().wishlistId);",
+              "pm.globals.set(\"wishlistIds\", ids);",
+              " ",
+              " let userCount = pm.globals.get(\"currentUserCount\");",
+              "  userCount++;",
+              "  pm.globals.set(\"currentUserCount\", userCount);",
+              "",
+              "if(userCount < pm.globals.get(\"numberOfUsers\")) {",
+              "    postman.setNextRequest(\"Create User\");",
+              "} else { ",
+              "    postman.setNextRequest(\"Add Book to User\");",
+              "}"
+            ],
+            "type": "text/javascript",
+            "id": "e0f518d8-7ea4-42cc-8229-daecfce920c5"
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const users = data.users; ",
+              "const user = _.sample(users); ",
+              "",
+              "pm.globals.set(\"email\", user.email);",
+              "pm.globals.set(\"firstName\", user.firstName);",
+              "pm.globals.set(\"lastName\", user.lastName);"
+            ],
+            "type": "text/javascript",
+            "id": "a1af3317-0783-4f5e-b3a7-4eafc94f4658"
+          }
+        }
+      ],
+      "_postman_id": "0ad35c88-481a-4f06-8f19-ee460881c3fc",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "G-TOKEN",
+            "value": "ROM831ESV",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\": \"{{email}}\",\n    \"firstName\": \"{{firstName}}\",\n    \"lastName\": \"{{lastName}}\",\n    \"householdId\": {{householdId}}\n}",
+          "options": {
+            "raw": {}
+          }
+        },
+        "url": "{{host}}/users"
+      },
+      "response": []
+    },
+    {
+      "name": "Create Second User",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.globals.set(\"secondWishlistId\", pm.response.json().wishlistId);"
+            ],
+            "type": "text/javascript",
+            "id": "4616ea32-240d-4958-8b82-d1f1264e6ed1"
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "console.log('Create Second User');"
+            ],
+            "type": "text/javascript",
+            "id": "8214c907-f19e-4c62-87ad-c262ed7cdae6"
+          }
+        }
+      ],
+      "_postman_id": "b5b7cd1e-9caf-471e-a782-0f2b3c47a419",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "G-TOKEN",
+            "value": "ROM831ESV",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\": \"taylonr@gmail.com\",\n    \"firstName\": \"Nate\",\n    \"lastName\": \"Taylor\",\n    \"householdId\": {{householdId}}\n}",
+          "options": {
+            "raw": {}
+          }
+        },
+        "url": "{{host}}/users"
+      },
+      "response": []
+    },
+    {
+      "name": "Add Book to User",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const books = pm.globals.get(\"bookIds\");",
+              "pm.globals.set(\"bookId\", _.sample(books))",
+              "",
+              "const wishlists = pm.globals.get(\"wishlistIds\");",
+              "pm.globals.set(\"wishlistId\", _.sample(wishlists))"
+            ],
+            "type": "text/javascript",
+            "id": "5b24ba99-9604-4052-9ac6-9992ea152bf5"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "let wishlistCount = pm.globals.get(\"currentWishlistCount\")",
+              "wishlistCount++;",
+              "pm.globals.set(\"currentWishlistCount\", wishlistCount);",
+              "",
+              "if(wishlistCount < pm.globals.get(\"numberOfWishlistAdds\")){",
+              "    postman.setNextRequest(\"Add Book to User\");",
+              "} else {",
+              "    postman.setNextRequest(\"Get Household Books\");",
+              "}"
+            ],
+            "type": "text/javascript",
+            "id": "0a899b1b-08fb-4b05-828c-ed51dbbab12a"
+          }
+        }
+      ],
+      "_postman_id": "d03b208e-6075-4d4d-9c3b-c62e36d3386a",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "G-TOKEN",
+            "value": "ROM831ESV",
+            "type": "text"
+          }
+        ],
+        "url": "{{host}}/wishlists/{{wishlistId}}/books/{{bookId}}"
+      },
+      "response": []
+    },
+    {
+      "name": "Add Book to Second User",
+      "_postman_id": "ed26ace9-8da0-4915-a523-efa353578e63",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "G-TOKEN",
+            "value": "ROM831ESV",
+            "type": "text"
+          }
+        ],
+        "url": "{{host}}/wishlists/{{secondWishlistId}}/books/2"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Household Books",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.globals.unset(\"householdId\");",
+              "pm.globals.unset(\"numberOfUsers\");",
+              "pm.globals.unset(\"currentUserCount\");",
+              "pm.globals.unset(\"numberOfWishlistAdds\");",
+              "pm.globals.unset(\"currentWishlistCount\");",
+              "pm.globals.unset(\"wishlistIds\");",
+              "pm.globals.unset(\"bookIds\");",
+              "pm.globals.unset(\"email\");",
+              "pm.globals.unset(\"firstName\");",
+              "pm.globals.unset(\"lastName\");",
+              "pm.globals.unset(\"bookId\");",
+              "pm.globals.unset(\"wishlistId\");"
+            ],
+            "type": "text/javascript",
+            "id": "1f8d3808-335c-4384-b004-7cb77e23b7c6"
+          }
+        }
+      ],
+      "_postman_id": "d4e37e55-dd40-489a-92d4-780fff2bced3",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "G-TOKEN",
+            "value": "ROM831ESV",
+            "type": "text"
+          }
+        ],
+        "url": "{{host}}/households/{{householdId}}/wishlistBooks"
+      },
+      "response": []
+    }
+  ]
+}
